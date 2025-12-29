@@ -14,17 +14,19 @@
 
 ### 專案結構
 
+
+```text
 RPGgame/
 ├── src/main/java/
-│ ├── Main/ # 主程式入口
-│ ├── GUI/ # 圖形介面
-│ ├── Entities/ # 實體類別（玩家、怪物）
-│ ├── Events/ # 事件處理
-│ ├── Skills/ # 技能系統
-│ ├── Objects/ # 道具系統
-│ └── Datas/ # 資料管理
+│   ├── Main/        # 主程式入口
+│   ├── GUI/         # 圖形介面
+│   ├── Entities/    # 實體類別（玩家、怪物）
+│   ├── Events/      # 事件處理
+│   ├── Skills/      # 技能系統
+│   ├── Objects/     # 道具系統
+│   └── Datas/       # 資料管理
 └── pom.xml
-
+```
 
 ## 核心功能
 
@@ -57,41 +59,44 @@ RPGgame/
 ```bash
 cd RPGgame
 mvn javafx:run
+```
 
-使用 Maven 打包
-mvn clean package
-
-執行 JAR 檔
-java -jar target/RPGgame-1.0-SNAPSHOT.jar
-
+#### 使用 Maven 打包
+```bash
+$ mvn clean package
+```
+#### 執行 JAR 檔
+```bash
+$ java -jar target/RPGgame-1.0-SNAPSHOT.jar
+```
 
 ## 近期更新
 
-### 🧵 執行緒與效能優化
+### 🧵 改進執行緒與效能
 - 所有 UI 更新統一透過 `Platform.runLater()` 執行，確保在 JavaFX Application Thread 中安全更新  
 - 以 `PauseTransition` 取代 `Thread.sleep()`，避免阻塞 UI、提升介面回應性  
 - 移除已廢棄的 `Thread.stop()`，改採 **協作式終止機制**，提升執行緒穩定性與可維護性  
 
-### 🎨 CSS 與介面調整
-- 全面改用 **十六進制色碼**，避免與 Modena 主題發生解析衝突  
+### 🎨 CSS 與介面調整 
 - 抑制不必要的 JavaFX CSS 警告訊息，簡化除錯輸出  
 - 重新設計進度條與按鈕樣式，提升整體視覺一致性  
 
 ### ✨ 動畫與視覺效果更新
 - 強化角色移動動畫的流暢度  
 - 新增傷害數字彈出效果  
-- 技能施放特效優化  
+- 改進技能施放特效  
 - 狀態變化加入即時視覺回饋  
 
 ### 🛠 問題修正
 - 修正 UI 更新時可能發生的執行緒競爭問題  
-- 解決 Modena 主題造成的 CSS 警告訊息問題  
+- 忽略 Modena 主題造成的 CSS 警告訊息問題  
 
 Thread.stop() 廢棄問題: 改用 volatile boolean 標誌控制執行緒
-### 🔧 持續優化
+### 🔧 持續更新
 - 效能調校
-- 記憶體使用優化
+- 改善記憶體使用情況
 - 更多遊戲內容擴充
+- 全面改用 **十六進制色碼**，避免與 Modena 主題發生解析衝突  
 
 Last Updated: 2025-12-29
-Version: 1.0.0
+Version: 1.2.0
