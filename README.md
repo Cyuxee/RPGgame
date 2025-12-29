@@ -88,10 +88,9 @@ $ java -jar target/RPGgame-1.0-SNAPSHOT.jar
 - 狀態變化加入即時視覺回饋  
 
 ### 🛠 問題修正
-- 修正 UI 更新時可能發生的執行緒競爭問題  
-- 忽略 Modena 主題造成的 CSS 警告訊息問題  
+- 修正 UI 更新時可能發生的執行緒競爭問題 
+- Thread.stop() 廢棄問題: 改用 volatile boolean 標誌控制執行緒
 
-Thread.stop() 廢棄問題: 改用 volatile boolean 標誌控制執行緒
 ### 🔧 持續更新
 - 效能調校
 - 改善記憶體使用情況
