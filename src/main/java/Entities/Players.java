@@ -63,19 +63,45 @@ public class Players implements Runnable{
 	private ArrayList<Objects> props;//道具
 	
 	public Players() {
+		this(false);
+	}
+	
+	/**
+	 * Headless-friendly constructor for unit tests.
+	 * <p>
+	 * When {@code headless == true}, it avoids creating default equipment objects that
+	 * build JavaFX {@code Background} images, so tests can run without initializing JavaFX.
+	 * Game/runtime behavior is unchanged because the default constructor still uses the
+	 * original default equipment implementations.
+	 */
+	public Players(boolean headless) {
 		Level = 1;
 		Id = "預設名字";
 		statusPoint = 5;
 		props = new ArrayList<Objects>();
 		Skills = new ArrayList<Skills>();
 		Area = new HashMap<Integer,Label>();
-		NOW_HELMET = new defaultHelmet(this);
-		NOW_ARMOR = new defaultArmor(this);
-		NOW_PANTS = new defaultPants(this);
-		NOW_SHOES = new defaultShoes(this);
-		NOW_WEAPON = new defaultWeapon(this);
+
+		if (headless) {
+			NOW_HELMET = new Objects(this);
+			NOW_HELMET.setWearType("HELMET");
+			NOW_ARMOR = new Objects(this);
+			NOW_ARMOR.setWearType("ARMOR");
+			NOW_PANTS = new Objects(this);
+			NOW_PANTS.setWearType("PANTS");
+			NOW_SHOES = new Objects(this);
+			NOW_SHOES.setWearType("SHOES");
+			NOW_WEAPON = new Objects(this);
+			NOW_WEAPON.setWearType("WEAPON");
+		} else {
+			NOW_HELMET = new defaultHelmet(this);
+			NOW_ARMOR = new defaultArmor(this);
+			NOW_PANTS = new defaultPants(this);
+			NOW_SHOES = new defaultShoes(this);
+			NOW_WEAPON = new defaultWeapon(this);
+		}
+
 		Money = 0;
-		
 		Diamond = 0;
 		STR=0+NOW_HELMET.getSTR()+NOW_ARMOR.getSTR()+NOW_PANTS.getSTR()+NOW_WEAPON.getSTR();//力量 +1 = 攻擊力 +3 血量 + 30 護甲 +2
 		INT=0+NOW_HELMET.getINT()+NOW_ARMOR.getINT()+NOW_PANTS.getINT()+NOW_WEAPON.getINT();//智慧 +1 = 魔力 + 30 魔法攻擊力 +3 魔法防禦力+2 魔法護頓 +15  

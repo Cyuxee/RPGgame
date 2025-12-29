@@ -2,8 +2,30 @@ package Skills;
 
 import Entities.Mobs;
 import Entities.Players;
-import GUI.GUI;
-import Skills.SkillPackage.*;
+import Skills.SkillPackage.ArmorDownBreak;
+import Skills.SkillPackage.BigIce;
+import Skills.SkillPackage.CircleSlade;
+import Skills.SkillPackage.Decay;
+import Skills.SkillPackage.DefendBody;
+import Skills.SkillPackage.DoubleHit;
+import Skills.SkillPackage.DragonFireBall;
+import Skills.SkillPackage.Excited;
+import Skills.SkillPackage.Explosive;
+import Skills.SkillPackage.FireBall;
+import Skills.SkillPackage.FireBreak;
+import Skills.SkillPackage.FusionSlade;
+import Skills.SkillPackage.GodBody;
+import Skills.SkillPackage.HealthBreak;
+import Skills.SkillPackage.MagicBoom;
+import Skills.SkillPackage.MagicOperate;
+import Skills.SkillPackage.MagicQuake;
+import Skills.SkillPackage.MagicSlade;
+import Skills.SkillPackage.MaxLow;
+import Skills.SkillPackage.NormalAttack;
+import Skills.SkillPackage.RuneOprate;
+import Skills.SkillPackage.Scare;
+import Skills.SkillPackage.Shout;
+import Skills.SkillPackage.SwordGod;
 
 
 
@@ -21,7 +43,7 @@ public class Skills {
 	protected boolean isMyself = false;
 	protected boolean isMagic = true;
 	protected boolean isPhysic = false;
-	protected static Players player = GUI.getPlayer();
+	protected Players player;
 	protected String type;//屬性
 	public Skills(Players player) {
 		this.player = player;
@@ -33,7 +55,7 @@ public class Skills {
 		
 	}
 	public Skills create() {
-		Skills skill = new Skills(player);
+		Skills skill = new Skills(this.player);
 		skill.setName("預設攻擊");
 		skill.setNote("預設攻擊");
 		skill.setDamage(1);

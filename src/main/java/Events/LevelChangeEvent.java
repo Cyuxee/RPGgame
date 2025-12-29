@@ -77,6 +77,30 @@ public class LevelChangeEvent {
 		}
 		
 	}
+	
+	/**
+	 * Core leveling logic without any GUI, sleeping, or persistence.
+	 * <p>
+	 * Intended for headless unit tests as a refactor-safety net.
+	 * Runtime/game behavior remains defined by {@link #judgeLevelUp(Players, Datas, Mobs)}.
+	 *
+	 * @return number of level-ups applied (0 if none)
+	 */
+	public static int applyLevelUpsNoUi(Players player) {
+		int levelUps = 0;
+		if (player.getExp() >= player.getMaxExp()) {
+			while (player.getExp() >= player.getMaxExp()) {
+				player.setExp(player.getExp() - player.getMaxExp());
+				player.setStatusPoint(player.getStatusPoint() + 5);
+				player.setLevel(player.getLevel() + 1);
+				player.updataPlayerStatus();
+				player.heal();
+				player.mpHeal();
+				levelUps++;
+			}
+		}
+		return levelUps;
+	}
 	public static boolean isLevelUp(Players player) {
 		if(player.getExp()>=player.getMaxExp()) {
 			return true;
