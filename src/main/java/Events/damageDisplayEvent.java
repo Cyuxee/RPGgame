@@ -1,9 +1,8 @@
 package Events;
 
-import Entities.Mobs;
-import Entities.Players;
-import GUI.GUI;
-import Objects.Objects;
+import java.util.EnumMap;
+import java.util.Map;
+
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -13,36 +12,37 @@ import javafx.scene.text.Font;
 public class damageDisplayEvent implements Runnable{
 	private Label damage1 = new Label();
 	private Label damage2 = new Label();
-
-	private Players player = GUI.getPlayer();
 	private AnchorPane ap;
-	private String index;
+	private DisplayType type;
 	private int damage;
+	private static final Map<DisplayType, DamageDisplayStrategy> STRATEGIES = new EnumMap<>(DisplayType.class);
+
+	static {
+		STRATEGIES.put(DisplayType.PLAYER_DAMAGE, damageDisplayEvent::displayPlayer);
+		STRATEGIES.put(DisplayType.PLAYER_HEAL, damageDisplayEvent::displayPlayerHeal);
+		STRATEGIES.put(DisplayType.PLAYER_MP_HEAL, damageDisplayEvent::displayPlayerMpHeal);
+		STRATEGIES.put(DisplayType.MOB_DAMAGE, damageDisplayEvent::displayMob);
+		STRATEGIES.put(DisplayType.MOB_MISS, damageDisplayEvent::displayMobMiss);
+		STRATEGIES.put(DisplayType.PLAYER_MISS, damageDisplayEvent::displayPlayerMiss);
+		STRATEGIES.put(DisplayType.PLAYER_BOOM, damageDisplayEvent::displayPlayerBoom);
+	}
 	
 	public damageDisplayEvent(AnchorPane ap,String index,int damage) {
+		this(ap, DisplayType.fromLegacy(index), damage);
+	}
+
+	public damageDisplayEvent(AnchorPane ap, DisplayType type, int damage) {
 		this.ap = ap;
-		this.index = index;
+		this.type = type;
 		this.damage = damage;
 	}
 	@Override
 	public void run() {
-		if(index.equals("playerDamage")) {//玩家傷害
-				displayPlayer();
-		}else if(index.equals("playerHeal")) {//玩家治癒
-				displayPlayerHeal();
-		}else if(index.equals("playerMpHeal")) {//玩家MP治癒
-				displayPlayerMpHeal();
-		}else if(index.equals("mobDamage")) {//怪物傷害
-				displayMob();			 
-		}else if(index.equals("mobMiss")) {//怪物MISS
-				displayMobMiss();
-		}else if(index.equals("playerMiss")) {//玩家MISS
-				displayPlayerMiss();
-		}else if(index.equals("playerBoom")) {//玩家暴擊
-				displayPlayerBoom();
-		}else {//錯誤
-			System.err.println("damageDisplayEvent 錯誤 "+index + " 請檢查程式碼");
+		DamageDisplayStrategy strategy = STRATEGIES.get(type);
+		if (strategy == null) {
+			throw new IllegalStateException("Unexpected damage display type: " + type);
 		}
+		strategy.display(this);
 	}
 	public void displayMobMiss() {//玩家的傷害顯示
 		double originY= 30+((int)(Math.random()*20));
@@ -287,6 +287,34 @@ public class damageDisplayEvent implements Runnable{
 			ap.getChildren().remove(damage1);
 		});
 	}
+
+	@FunctionalInterface
+	private interface DamageDisplayStrategy {
+		void display(damageDisplayEvent ctx);
+	}
 	
+	public enum DisplayType {
+		PLAYER_DAMAGE,
+		PLAYER_HEAL,
+		PLAYER_MP_HEAL,
+		MOB_DAMAGE,
+		MOB_MISS,
+		PLAYER_MISS,
+		PLAYER_BOOM;
+
+		public static DisplayType fromLegacy(String index) {
+			return switch (index) {
+			case "playerDamage" -> PLAYER_DAMAGE;
+			case "playerHeal" -> PLAYER_HEAL;
+			case "playerMpHeal" -> PLAYER_MP_HEAL;
+			case "mobDamage" -> MOB_DAMAGE;
+			case "mobMiss" -> MOB_MISS;
+			case "playerMiss" -> PLAYER_MISS;
+			case "playerBoom" -> PLAYER_BOOM;
+			default -> throw new IllegalArgumentException("Unknown damage display index: " + index);
+			};
+		}
+	}
+
 
 }

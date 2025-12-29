@@ -644,7 +644,7 @@ public class GUI extends Application{
 					Thread tsetName = new Thread(set);
 					if(player.getPlayer().equals("預設名字")) {
 						stage.setOpacity(0);
-						imageChange ic = new imageChange(player,tsetName,stage);
+						imageChange ic = new imageChange(player, tsetName, stage);
 						//yourStage.show();
 						try {
 							ic.start();

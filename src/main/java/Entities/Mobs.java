@@ -16,30 +16,24 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
 import javafx.scene.text.Font;
 
-public class Mobs implements Runnable{
+public class Mobs extends CombatEntity {
 	
 	private static Label mobCount;//血量計數
 	private static Label mobStatus;//怪物屬性等級 名稱
 	private static ProgressBar pbar;//怪物血量顯示
-	private ArrayList<skillStatus> buffs = new ArrayList<>();//buff的統計處
 	
 	private static boolean isIced = false;
 	
 	private int ID;
 	private String NAME;
-	private int maxHealth;
-	private int LEVEL;
-	private int Damage;
-	private int armor;
-	private int Health;
 	private int Money;
 	private int Diamond;
-	private int escape= 0;//閃避率
 	
 	private double Exp;
 	private	static int count = 0;
 	private ArrayList<Objects> drop = new ArrayList<>();
 	public Mobs(int areaLevel,int areaName) {
+		super();
 		if(areaLevel==9&&areaName==9) {
 			NAME = "魔王";
 		}
@@ -50,17 +44,17 @@ public class Mobs implements Runnable{
 			System.err.println("!!小王掉落物尚未調整!!");
 			NAME = Area.name(areaName)+" (王級)";
 	
-			LEVEL = Area.level(areaLevel);
-			maxHealth = (int)(6.26*Math.pow(LEVEL,2)+12.2*LEVEL+163.4*Math.random())*3;
+			level = Area.level(areaLevel);
+			maxHealth = (int)(6.26*Math.pow(level,2)+12.2*level+163.4*Math.random())*3;
 			
-			Health = maxHealth;
+			health = maxHealth;
 		
-			Damage = (int)(8.2*LEVEL+1.5+20*Math.random())*3;
-			armor =(int)(1.32*Math.pow(LEVEL,2)+5.2*LEVEL+120*Math.random())*3;
-			Money = (int)(1.56*Math.pow(LEVEL,2)+3.2*LEVEL+63.4*Math.random())*10;
-			Diamond = (int)(100+LEVEL*2.3);
-//			escape = (int)(LEVEL*0.3)*2;
-			Exp = (int)Math.pow((LEVEL*30.26+Math.getExponent(LEVEL*Math.random()*(areaLevel+100))),1.06)*5;
+			damage = (int)(8.2*level+1.5+20*Math.random())*3;
+			armor =(int)(1.32*Math.pow(level,2)+5.2*level+120*Math.random())*3;
+			Money = (int)(1.56*Math.pow(level,2)+3.2*level+63.4*Math.random())*10;
+			Diamond = (int)(100+level*2.3);
+//			escape = (int)(level*0.3)*2;
+			Exp = (int)Math.pow((level*30.26+Math.getExponent(level*Math.random()*(areaLevel+100))),1.06)*5;
 			ID = count++;			
 			skillStatus.setLabel(this);
 		}else if(rand>=10&&areaLevel!=9&&areaName!=9){
@@ -69,16 +63,16 @@ public class Mobs implements Runnable{
 			drop = mde.getDrop();
 			NAME = Area.name(areaName);
 
-			LEVEL = Area.level(areaLevel);
-			maxHealth = (int)(6.26*Math.pow(LEVEL,2)+12.2*LEVEL+163.4*Math.random());
-			Health = maxHealth;
+			level = Area.level(areaLevel);
+			maxHealth = (int)(6.26*Math.pow(level,2)+12.2*level+163.4*Math.random());
+			health = maxHealth;
 
-			Damage = (int)(8.2*LEVEL+1.5+20*Math.random());
-			armor =(int)(1.32*Math.pow(LEVEL,2)+5.2*LEVEL+120*Math.random());
-			Money = (int)(1.56*Math.pow(LEVEL,2)+3.2*LEVEL+63.4*Math.random());
+			damage = (int)(8.2*level+1.5+20*Math.random());
+			armor =(int)(1.32*Math.pow(level,2)+5.2*level+120*Math.random());
+			Money = (int)(1.56*Math.pow(level,2)+3.2*level+63.4*Math.random());
 			Diamond = 0;
-			escape = (int)(LEVEL*0.3);
-			Exp = (int)Math.pow((LEVEL*30.26+Math.getExponent(LEVEL*Math.random()*(areaLevel+100))),1.06);
+			escape = (int)(level*0.3);
+			Exp = (int)Math.pow((level*30.26+Math.getExponent(level*Math.random()*(areaLevel+100))),1.06);
 			ID = count++;
 			skillStatus.setLabel(this);
 		}
@@ -134,16 +128,16 @@ public class Mobs implements Runnable{
 			eb = GUI.backgroundCreate("/Images/魔王分身.png");
 		}else if(NAME.equals("魔王")){
 			eb = GUI.backgroundCreate("/Images/魔王.png");
-			LEVEL = 90;
-			maxHealth = (int)(6.26*Math.pow(LEVEL,2)+12.2*LEVEL+163.4*Math.random())+999999;
-			Health = maxHealth;
+			level = 90;
+			maxHealth = (int)(6.26*Math.pow(level,2)+12.2*level+163.4*Math.random())+999999;
+			health = maxHealth;
 
-			Damage = (int)(12.2*LEVEL+1.5+20*Math.random())+9999;
-			armor =(int)(1.32*Math.pow(LEVEL,2)+5.2*LEVEL+120*Math.random())+9999;
-			Money = (int)(1.56*Math.pow(LEVEL,2)+3.2*LEVEL+63.4*Math.random())+999999;
+			damage = (int)(12.2*level+1.5+20*Math.random())+9999;
+			armor =(int)(1.32*Math.pow(level,2)+5.2*level+120*Math.random())+9999;
+			Money = (int)(1.56*Math.pow(level,2)+3.2*level+63.4*Math.random())+999999;
 			Diamond = 10000;
 			escape = (int)200;
-			Exp = (int)Math.pow((LEVEL*8.26+Math.getExponent(LEVEL*Math.random()*(areaLevel+100))),1.06)+109999;
+			Exp = (int)Math.pow((level*8.26+Math.getExponent(level*Math.random()*(areaLevel+100))),1.06)+109999;
 			ID = count++;
 			skillStatus.setLabel(this);
 		}
@@ -218,43 +212,16 @@ public class Mobs implements Runnable{
 		this.NAME = name;
 		return;
 	}
-	public int getEscape() {//閃避率
-		return this.escape;
-	}
-	public void setEscape(int escape) {//閃避率
-		this.escape = escape;
-	}
-	public int getLevel() {
-		return this.LEVEL;
-	}
-	public void setLevel(int LEVEL) {
-		this.LEVEL = LEVEL;
-	}
 	public String getName() {
 		return this.NAME;
 	}
+	
+	@Override
 	public void setMaxHealth(int health) {
 		this.maxHealth = health;
-		this.Health = health;
-		return;
+		this.health = health;
 	}
-	public void setHealth(int health) {
-		this.Health = health;
-		return;
-	}
-	public int getHealth() {
-		return this.Health;
-	}
-	public int getMaxHealth() {
-		return this.maxHealth;
-	}
-	public void setDamage(int damage) {
-		this.Damage = damage;
-		return;
-	}
-	public int getDamage() {
-		return this.Damage;
-	}
+	
 	public void setExp(int exp) {
 		this.Exp = exp;
 		return;
@@ -276,20 +243,14 @@ public class Mobs implements Runnable{
 		return mobCount;
 	}
 	public void setPBar(ProgressBar pbar) {
-		pbar.setProgress((double)Health/(double)maxHealth);
+		pbar.setProgress((double)health/(double)maxHealth);
 	}
 	public ProgressBar getPBar() {
 		return pbar;
 	} 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-	}
-	public ArrayList<skillStatus> getBuffs() {
-		return buffs;
-	}
-	public void setBuffs(ArrayList<skillStatus> buffs) {
-		this.buffs = buffs;
+		// Intentionally empty - Runnable interface required but not used
 	}
 	
 }

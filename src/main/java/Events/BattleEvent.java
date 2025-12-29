@@ -8,7 +8,7 @@ import Datas.Datas;
 import Entities.Mobs;
 import Entities.Players;
 import GUI.GUI;
-import GUI.GUI.propsUpSort;
+import GUI.GUI.propsUpSort; 
 import GUI.imageChange2;
 import javafx.animation.PauseTransition;
 import Objects.Objects;
@@ -133,14 +133,14 @@ public class BattleEvent implements Runnable{
 		DataCommander dataCommand = new DataCommander();
 		
 		player.updataPlayerStatus();//更新狀態
-		BattleMoveEvent move = new BattleMoveEvent(combating,health,damage1,damage2,attack,propb,skills,run,player,mob,friends,250,enemys,-250);
-		runDamageEvent runMove = new runDamageEvent(combating,attack,propb,skills,run,damage1,damage2,player, mob,friends,enemys,250,-250, 1,10,20);
+		Runnable attackAction = BattleActionFactory.createAttackAction(combating,health,damage1,damage2,attack,propb,skills,run,player,mob,friends,enemys);
+		Runnable runAction = BattleActionFactory.createRunAction(combating,attack,propb,skills,run,damage1,damage2,player,mob,friends,enemys);
 		
 		attack.setOnAction(new EventHandler<ActionEvent>(){
 			
 			@Override
 			public void handle(ActionEvent event) {	
-				att = new Thread(move);
+				att = new Thread(attackAction);
 				att.start();
 			}
 		});
@@ -254,7 +254,7 @@ public class BattleEvent implements Runnable{
 						}
 					});	
 				}else {
-					Thread runTh = new Thread(runMove);
+					Thread runTh = new Thread(runAction);
 					runTh.start();
 					System.out.println("逃跑失敗!");
 				}
@@ -296,7 +296,7 @@ public class BattleEvent implements Runnable{
 					@Override
 					public void run() {
 						if(mob.getName().equals("魔王")&&player.isEnd()==false) {
-							imageChange2 ic = new imageChange2(player,new Stage());
+							imageChange2 ic = new imageChange2(player, new Stage());
 									PauseTransition pause = new PauseTransition(Duration.millis(300));
 									pause.setOnFinished(ev -> {
 										try {

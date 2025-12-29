@@ -2,9 +2,7 @@ package Events;
 
 import Entities.Mobs;
 import Entities.Players;
-import GUI.GUI;
 import Skills.Skills;
-import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -54,75 +52,18 @@ public class runDamageEvent implements Runnable{
 
 	@Override
 	public void run() {
-		Platform.runLater(() -> {
-			attack.setDisable(true);
-			props.setDisable(true);
-			skills.setDisable(true);
-			run.setDisable(true);
-		});
+		CombatFlowHelper.disableControls(attack, props, skills, run);
 		
 		try {
-			Thread.sleep(200);
+			Thread.sleep(CombatTimingConstants.COMBAT_ACTION_DELAY);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	
-		if(mob.getHealth()>0&&!mob.getIsIced()) {//怪物的移動和傷害damage1
-			
-			double origin12 = toMove2.getLayoutX();
-			
-			Platform.runLater(() -> GUI.move2(toMove2, distance2));
-				
-
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			Platform.runLater(() -> toMove2.setLayoutX(origin12));
-			if((int)(Math.random()*99)<=player.getEscape()) {					
-				damageDisplayEvent dde = new damageDisplayEvent(combating, "mobMiss", 0);						
-				Thread t = new Thread(dde);						
-				t.start();						
-			}else {										
-				damageDisplayEvent dde = new damageDisplayEvent(combating, "mobDamage", DamageEvent.damageTo(mob,player));												
-				Thread t = new Thread(dde);	
-				t.start();					
-			}
-			 
- 
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			 
-			
-		}
-		mob.setIsIced(false);//凍結初始化
-		for(int i = 0 ; i < GUI.getPlayer().getSkills().size() ; i ++) {
-			if(GUI.getPlayer().getSkills().get(i).isCanBeApply()==false) {
-				if(GUI.getPlayer().getSkills().get(i).getNowCooldown()>=GUI.getPlayer().getSkills().get(i).getCool()-1) {
-					GUI.getPlayer().getSkills().get(i).setCanBeApply(true);
-					GUI.getPlayer().getSkills().get(i).setNowCooldown(-1);
-				}else {
-					GUI.getPlayer().getSkills().get(i).setNowCooldown(GUI.getPlayer().getSkills().get(i).getNowCooldown()+1);
-				}
-			}
-		}
-		if(!player.getBuffs().isEmpty()||!mob.getBuffs().isEmpty()) {
-			statusThread stt = new statusThread(attack, props, skills, run, times, distance, mob);
-			stt.run();
-		}else {
-			BattleEvent.updateCombatCount();
-
-			Platform.runLater(() -> {
-				attack.setDisable(false);
-				props.setDisable(false);
-				skills.setDisable(false);
-				run.setDisable(false);
-			});
-		}
+		CombatFlowHelper.performMobAttack(combating, player, mob, toMove2, distance2, 300, 300);
+		CombatFlowHelper.resetMobFreeze(mob);
+		CombatFlowHelper.updateSkillCooldowns(player);
+		CombatFlowHelper.resolveStatusOrEnable(player, mob, attack, props, skills, run, times, distance);
 		
  	}
  

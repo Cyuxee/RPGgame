@@ -64,16 +64,13 @@ public class skillAndMoveEvent implements Runnable{
 
 	@Override
 	public void run() {		
- 		attack.setDisable(true);
-		props.setDisable(true);
-		skills.setDisable(true);
-		run.setDisable(true);
+		CombatFlowHelper.disableControls(attack, props, skills, run);
 		GUI.HPMPUpdate(player);
 		GUI.HPMPLoaderUpdata(player);
 		
 		
 		try {
-			Thread.sleep(200);
+			Thread.sleep(CombatTimingConstants.COMBAT_ACTION_DELAY);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -97,16 +94,16 @@ public class skillAndMoveEvent implements Runnable{
 					isHit = (int)(Math.random()*99)<=(player.getSkills().get(index).getSkillHit()-mob.getEscape());
 					if(isHit) {
 						if((int)(Math.random()*99)<=player.getBoom()) {
-							damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), "playerBoom", SkillsDischargeEvents.applySkill(player, mob, index,true));
+							damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), damageDisplayEvent.DisplayType.PLAYER_BOOM, SkillsDischargeEvents.applySkill(player, mob, index,true));
 							Thread t = new Thread(dde);
 							t.start();
   						}else {
-							damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), "playerDamage", SkillsDischargeEvents.applySkill(player, mob, index,false));
+							damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), damageDisplayEvent.DisplayType.PLAYER_DAMAGE, SkillsDischargeEvents.applySkill(player, mob, index,false));
 							Thread t = new Thread(dde);
 							t.start();
  						}
 					}else {
-						damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), "playerMiss", 0);
+						damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), damageDisplayEvent.DisplayType.PLAYER_MISS, 0);
 						Thread t = new Thread(dde);
 						t.start();
 					}
@@ -120,61 +117,16 @@ public class skillAndMoveEvent implements Runnable{
 		SkillsDischargeEvents.applySkill(player, mob, index,false);
 	}
 		if(mob.getHealth()>0&&!mob.getIsIced()) {//怪物的移動和傷害damage1
-			
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			double origin12 = toMove2.getLayoutX();
-			
-			GUI.move2(toMove2, distance2);
-  
-
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			toMove2.setLayoutX(origin12);
-
-
-					if((int)(Math.random()*99)<=player.getEscape()) {
-						damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), "mobMiss", 0);
-						Thread t = new Thread(dde);
-						t.start();
-					}else {				
-						damageDisplayEvent dde = new damageDisplayEvent(GUI.getCombating(), "mobDamage", DamageEvent.damageTo(mob, player));
-						Thread t = new Thread(dde);
-						t.start();
-					}
- 	
-			 
-			 
-			}
-		mob.setIsIced(false);//凍結初始化
-		for(int i = 0 ; i < GUI.getPlayer().getSkills().size() ; i ++) {
-			if(GUI.getPlayer().getSkills().get(i).isCanBeApply()==false) {
-				if(GUI.getPlayer().getSkills().get(i).getNowCooldown()>=GUI.getPlayer().getSkills().get(i).getCool()-1) {
-					GUI.getPlayer().getSkills().get(i).setCanBeApply(true);
-					GUI.getPlayer().getSkills().get(i).setNowCooldown(-1);
-
-				}else {
-					GUI.getPlayer().getSkills().get(i).setNowCooldown(GUI.getPlayer().getSkills().get(i).getNowCooldown()+1);
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 				}
+				CombatFlowHelper.performMobAttack(GUI.getCombating(), player, mob, toMove2, distance2, 200, 0);
 			}
-		}
-		if(!player.getBuffs().isEmpty()||!mob.getBuffs().isEmpty()) {
-			statusThread stt = new statusThread(attack, props, skills, run, times, distance, mob);
-			stt.run();
-		}else {
-			BattleEvent.updateCombatCount();
-
-			attack.setDisable(false);
-			props.setDisable(false);
-			skills.setDisable(false);
-			run.setDisable(false);
-		}
+		CombatFlowHelper.resetMobFreeze(mob);//凍結初始化
+		CombatFlowHelper.updateSkillCooldowns(player);
+		CombatFlowHelper.resolveStatusOrEnable(player, mob, attack, props, skills, run, times, distance);
 		
 		if(isHit) {//如果命中
 			player.getSkills().get(index).getEffect(mob);

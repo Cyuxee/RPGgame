@@ -4,17 +4,21 @@ import Entities.Mobs;
 import Entities.Players;
 
 public class GetExpEvent {
-	public static void combatGetExp(Players player,Mobs mob) {
-	     if(DeathEvent.mobDeath(mob)) {
-	    	 System.out.printf("你獲得 %.1f 經驗值!\n",mob.getExp());
-	    	 player.setExp(player.getExp()+mob.getExp());
-	     }
+	private static final double DEATH_EXP_LOSS_RATE = 0.05;
+
+	public static void combatGetExp(Players player, Mobs mob) {
+		if (DeathEvent.mobDeath(mob)) {
+			double expGained = mob.getExp();
+			System.out.printf("你獲得 %.1f 經驗值!\n", expGained);
+			player.gainExp(expGained);
+		}
 	}
+
 	public static void lostExp(Players player) {
-	     if(DeathEvent.playerDeath(player)) {
-	    	 double lossExp = player.getMaxExp()*0.05;
-	    	 System.out.printf("你失去 %.1f 經驗值!\n",lossExp);
-	    	 player.setExp(player.getExp()-lossExp);
-	     }
+		if (DeathEvent.playerDeath(player)) {
+			double lossExp = player.getMaxExp() * DEATH_EXP_LOSS_RATE;
+			System.out.printf("你失去 %.1f 經驗值!\n", lossExp);
+			player.loseExp(lossExp);
+		}
 	}
 }

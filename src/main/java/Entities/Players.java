@@ -16,16 +16,12 @@ import Skills.SkillPackage.FireBall;
 import Skills.SkillPackage.NormalAttack;
 import javafx.scene.control.Label;
 
-public class Players implements Runnable{
+public class Players extends CombatEntity {
 	private String Id;//名字
-	private int Level;//等級
-	private int Armor;//防禦力
-	private int Damage;//物理傷害
 	private int MagicDamage;//魔法傷害(或是技能傷害)
 	private boolean isEnd = false;
 
 	
-	private static ArrayList<skillStatus> buffs = new ArrayList<>();//buff統計處要記得static這樣才能共同存取一個記憶體位置
 	private static ArrayList<Thread> damageDisplay = new ArrayList<>();//buff統計處要記得static這樣才能共同存取一個記憶體位置
 	
 	private Objects NOW_HELMET = null;
@@ -47,9 +43,7 @@ public class Players implements Runnable{
 	private int statusPoint;//能力點
 	
 	private int Hit;//命中率
-	private	int maxHealth;//最大生命
 	private	int nowHealth;//當前生命
-	private int escape;//閃避率
 	private int boom;//暴擊率
 	private double boomAttackRate=1.5;//暴擊傷害倍率 => 總傷害=(物理傷害or魔法傷害)*暴擊倍率
 	private	double nowExp;//經驗值
@@ -75,7 +69,9 @@ public class Players implements Runnable{
 	 * original default equipment implementations.
 	 */
 	public Players(boolean headless) {
-		Level = 1;
+		super();
+		// Players uses non-static buffs list (inherited from CombatEntity)
+		level = 1;
 		Id = "預設名字";
 		statusPoint = 5;
 		props = new ArrayList<Objects>();
@@ -107,7 +103,7 @@ public class Players implements Runnable{
 		INT=0+NOW_HELMET.getINT()+NOW_ARMOR.getINT()+NOW_PANTS.getINT()+NOW_WEAPON.getINT();//智慧 +1 = 魔力 + 30 魔法攻擊力 +3 魔法防禦力+2 魔法護頓 +15  
 		LUK=0+NOW_HELMET.getLUK()+NOW_ARMOR.getLUK()+NOW_PANTS.getLUK()+NOW_WEAPON.getLUK();//幸運 +1 = 暴擊率 + 2 攻擊力 +2 血量 +10
 		AGI=0+NOW_HELMET.getAGI()+NOW_ARMOR.getAGI()+NOW_PANTS.getAGI()+NOW_WEAPON.getAGI();//敏捷 +1 = 迴避值 + 3 攻擊力 +1 血量 +10 
-		Damage = 15;
+		damage = 15;
 		maxHealth =200;
 		nowHealth = maxHealth;
 		maxMana = 200;
@@ -257,19 +253,18 @@ public class Players implements Runnable{
 	public int getHit() {
 		return this.Hit;
 	}
-	public void setLevel(int level) {
-		this.Level = level;
-		return;
-	}
-	public int getLevel() {
-		return this.Level;
-    }
 	public double getExp() {
 		return this.nowExp;
 	}
 	public void setExp(double exp) {
 		this.nowExp = exp;
 		return;
+	}
+	public void gainExp(double amount) {
+		this.nowExp += amount;
+	}
+	public void loseExp(double amount) {
+		this.nowExp -= amount;
 	}
 	public double getMaxExp() {
 		return this.needExp;
@@ -279,31 +274,25 @@ public class Players implements Runnable{
 		this.needExp = exp;
 		return;
 	}
+	
+	@Override
 	public void setMaxHealth(int health) {
 		this.maxHealth = health ;
-		return;
 	}
 
 	public void setHealth(int health) {
 		this.nowHealth = health ;
-		return;
 	}
+	
+	@Override
 	public int getHealth() {
 		return this.nowHealth;
 	}
-	public int getMaxHealth() {
-		return this.maxHealth;
-	}
+	
 	public void showHealth() {
 		System.out.println("Player " + this.Id + "'s health is " + this.nowHealth + "/" + this.maxHealth);
-		return;
 	}
-	public void setArmor(int Armor) {
-		this.Armor = Armor;
-	}
-	public int getArmor() {
-		return this.Armor;
-	}
+	
 	public String getPlayer() {
 		return this.Id;
 	}
@@ -379,30 +368,16 @@ public class Players implements Runnable{
 	public int getTotalSTR() {
 		return this.totalSTR;
 	}
-	public void setDamage(int damage) {
-		this.Damage = damage;
-		return;
-	}
-	public int getDamage() {
-		return this.Damage;
-	}
+	
 	public void setBoom(int boom) {//暴擊率
 		this.boom = boom;
-		return;
 	}
 	public int getBoom() {
 		return this.boom;
 	}
-	public int getEscape() {//閃避率
-		return this.escape;
-	}
-	public void setEscape(int escape) {
-		this.escape = escape;
-		return;
-	}
+	
 	public void setMagicDamage(int Magicdamage) {
 		this.MagicDamage = Magicdamage;
-		return;
 	}
 	public int getMagicDamage() {
 		return this.MagicDamage;
@@ -422,12 +397,6 @@ public class Players implements Runnable{
 	
 	@Override
 	public void run() {
-	}
-	public ArrayList<skillStatus> getBuffs() {
-		return buffs;
-	}
-	public void setBuffs(ArrayList<skillStatus> buffs) {
-		this.buffs = buffs;
 	}
 	
 }
